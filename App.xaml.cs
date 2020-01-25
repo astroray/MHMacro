@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -32,6 +34,8 @@ namespace MHMacro
         private KeyboardListener   _keyboardListener = new KeyboardListener();
         private RawKeyEventHandler _keyEventHandler;
         private bool               _enabled;
+        private Process            _mhProcess;
+
         private bool enabled
         {
             get => _enabled;
@@ -52,6 +56,19 @@ namespace MHMacro
             }
         }
 
+        private Process mhProcess
+        {
+            get
+            {
+                if (_mhProcess == null)
+                {
+                    _mhProcess = Process.GetProcessesByName("MonsterHunterWorld").FirstOrDefault();
+                }
+
+                return _mhProcess;
+            }
+        }
+
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
             _keyEventHandler          =  OnKeydown;
@@ -66,25 +83,36 @@ namespace MHMacro
 
                 if (enabled)
                 {
-                    Task.Run(() =>
-                    {
-                        var random = new Random();
-                        var input  = new InputMessenger();
+                    Task.Run(SendInputMessage);
+                }
+            }
+        }
 
-                        while (enabled)
-                        {
-                            var pickedPerm = _permutaion[random.Next(0, _permutaion.Length)];
+        private async Task SendInputMessage()
+        {
+            var random    = new Random();
+            var input     = new InputMessenger();
+            var keyBuffer = new VirtualKeyCode[4];
 
-                            for (int i = 0; i < _keys.Length; i++)
-                            {
-                                var key = _keys[pickedPerm[i]];
+            if (mhProcess != null)
+            {
+                Native.SetForegroundWindow(mhProcess.MainWindowHandle);
+            }
 
-                                input.SendKey(key);
-                            }
+            while (enabled)
+            {
+                var pickedPerm = _permutaion[random.Next(0, _permutaion.Length)];
 
-                            input.SendKey(VirtualKeyCode.SPACE);
-                        }
-                    });
+                for (int i = 0; i < _keys.Length; i++)
+                {
+                    keyBuffer[i] = _keys[pickedPerm[i]];
+                }
+
+                keyBuffer[keyBuffer.Length - 1] = VirtualKeyCode.SPACE;
+
+                foreach (var bufferedKey in keyBuffer)
+                {
+                    await input.SendKey(mhProcess, bufferedKey);
                 }
             }
         }
