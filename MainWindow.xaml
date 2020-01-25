@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MHMacro" Height="110" Width="230">
     <StackPanel VerticalAlignment="Center">
-        <TextBlock HorizontalAlignment="Left" Margin="40,0,0,0">Ctrl + Tab : 활성/비활성</TextBlock>
+        <TextBlock HorizontalAlignment="Left" Margin="40,0,0,0">Ctrl + Q : 활성/비활성</TextBlock>
         <TextBlock x:Name="stateText" HorizontalAlignment="Left" Margin="40,0,0,0">현재상태 : 비활성화</TextBlock>
     </StackPanel>
 </Window>

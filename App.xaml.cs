@@ -76,7 +76,7 @@ namespace MHMacro
 
         private void OnKeydown(object sender, RawKeyEventArgs args)
         {
-            if (args.isControlPressed && args.Key == Key.Tab)
+            if (args.isControlPressed && args.Key == Key.Q)
             {
                 enabled = !enabled;
 
