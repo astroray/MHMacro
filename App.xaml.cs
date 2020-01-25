@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using WindowsInput;
 using WindowsInput.Native;
 
 namespace MHMacro
@@ -77,7 +76,7 @@ namespace MHMacro
 
         private void OnKeydown(object sender, RawKeyEventArgs args)
         {
-            if (args.isControlPressed && args.Key == Key.Tab)
+            if (args.isControlPressed && args.Key == Key.Q)
             {
                 enabled = !enabled;
 
