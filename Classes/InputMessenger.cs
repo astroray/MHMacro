@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,8 +13,15 @@ namespace MHMacro
     {
         public IInputSimulator _inputSimulator = new InputSimulator();
 
-        public void SendKey(VirtualKeyCode key, int duration = 10)
+        public async Task SendKey(Process target, VirtualKeyCode key, int duration = 10)
         {
+            if (target == null || target.MainWindowHandle != Native.GetForegroundWindow())
+            {
+                await Task.Delay(duration);
+
+                return;
+            }
+
             _inputSimulator.Keyboard
                            .KeyDown(key)
                            .Sleep(duration)
