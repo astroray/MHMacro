@@ -1,0 +1,13 @@
+﻿<Window x:Class="MHMacro.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MHMacro"
+        mc:Ignorable="d"
+        Title="MHMacro" Height="110" Width="230">
+    <StackPanel VerticalAlignment="Center">
+        <TextBlock HorizontalAlignment="Left" Margin="40,0,0,0">Ctrl + Tab : 활성/비활성</TextBlock>
+        <TextBlock x:Name="stateText" HorizontalAlignment="Left" Margin="40,0,0,0">현재상태 : 비활성화</TextBlock>
+    </StackPanel>
+</Window>
