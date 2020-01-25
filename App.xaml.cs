@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using WindowsInput;
 using WindowsInput.Native;
 
 namespace MHMacro
@@ -19,7 +20,7 @@ namespace MHMacro
             VirtualKeyCode.RIGHT
         };
 
-        private static readonly int[][] _permutaion =
+        private static readonly int[][] _permutation =
         {
             new[] { 0, 1, 2 },
             new[] { 0, 2, 1 },
@@ -29,11 +30,15 @@ namespace MHMacro
             new[] { 2, 0, 1 }
         };
 
+        private static readonly string _processName = "MonsterHunterWorld";
+
         public event Action<bool> StateChange;
 
         private KeyboardListener   _keyboardListener = new KeyboardListener();
         private RawKeyEventHandler _keyEventHandler;
         private bool               _enabled;
+        private Process            _process;
+
         private bool enabled
         {
             get => _enabled;
@@ -49,6 +54,19 @@ namespace MHMacro
             }
         }
 
+        private Process process
+        {
+            get
+            {
+                if (_process == null)
+                {
+                    _process = Process.GetProcessesByName(_processName).FirstOrDefault();
+                }
+
+                return _process;
+            }
+        }
+
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
             _keyEventHandler          =  OnKeydown;
@@ -57,7 +75,7 @@ namespace MHMacro
 
         private void OnKeydown(object sender, RawKeyEventArgs args)
         {
-            if (args.isControlPressed && args.Key == Key.Tab)
+            if (args.isControlPressed && args.Key == Key.Q)
             {
                 enabled = !enabled;
 
@@ -65,28 +83,26 @@ namespace MHMacro
                 {
                     Task.Run(() =>
                     {
-                        var random      = new Random();
-                        var inputHelper = new InputSimulator();
+                        var random = new Random();
+                        var input  = new InputMessenger(process);
 
-                        while (enabled)
+                        Native.SetForegroundWindow(process.MainWindowHandle);
+
+                        while (enabled && process == null)
                         {
-                            var pickedPerm = _permutaion[random.Next(0, _permutaion.Length)];
+                            var pickedPerm = _permutation[random.Next(0, _permutation.Length)];
 
                             for (int i = 0; i < _keys.Length; i++)
                             {
                                 var key = _keys[pickedPerm[i]];
 
-                                inputHelper.Keyboard
-                                           .KeyDown(key)
-                                           .Sleep(10)
-                                           .KeyUp(key);
+                                input.SendKey(key);
                             }
 
-                            inputHelper.Keyboard
-                                       .KeyDown(VirtualKeyCode.SPACE)
-                                       .Sleep(10)
-                                       .KeyUp(VirtualKeyCode.SPACE);
+                            input.SendKey(VirtualKeyCode.SPACE);
                         }
+
+                        enabled = false;
                     });
                 }
             }
